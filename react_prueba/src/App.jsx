@@ -1,33 +1,87 @@
+import { BrowserRouter, Route, Routes, Outlet, useLocation, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import './App.css';
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import Login from './views/Login';
 import Profile from './views/Profile';
 import Contact from './views/Contact';
+import Admin from './views/Admin';
 import ResponsiveAppBar from './components/NavBar';
 
-function Layout() {
-  const location = useLocation();
+const API_URL = "http://localhost:3000"
 
-  // ocultar navbar en login
+function Layout({ isLogin, user, users, login, addUser, delUser }) {
+  const location = useLocation();
   const hideNavbar = location.pathname === '/';
 
   return (
     <>
-      {!hideNavbar && <ResponsiveAppBar />}
-
-      <Routes>
-        <Route path='/' element={<Login />} />
-        <Route path='/profile' element={<Profile />} />
-        <Route path='/contact' element={<Contact />} />
-      </Routes>
+      {!hideNavbar && isLogin && <ResponsiveAppBar />}
+      <Outlet context={{ isLogin, user, users, login, addUser, delUser }} />
     </>
   );
 }
 
 function App() {
+  const [isLogin, setIsLogin] = useState(false);
+  const [user, setUser] = useState({});
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    if (isLogin) {
+      const getUsers = async () => {
+        const res = await fetch(API_URL + "/api/users");
+        const data = await res.json();
+        setUsers(data);
+      };
+      getUsers();
+    }
+  }, [isLogin]);
+
+  const login = async (username, password) => {
+    try {
+      const res = await fetch(API_URL + "/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (data.login) {
+        setUser(data.user);
+        setIsLogin(true);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error("Error al conectar con la API:", err);
+      return false;
+    }
+  };
+
+  const addUser = async (newUser) => {
+    const res = await fetch(API_URL + "/api/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newUser)
+    });
+    const data = await res.json();
+    setUsers(prev => [...prev, data]);
+  };
+
+  const delUser = async (id) => {
+    await fetch(API_URL + "/api/users/" + id, { method: "DELETE" });
+    setUsers(prev => prev.filter(u => u._id !== id));
+  };
+
   return (
     <BrowserRouter>
-      <Layout />
+      <Routes>
+        <Route element={<Layout isLogin={isLogin} user={user} users={users} login={login} addUser={addUser} delUser={delUser} />}>
+          <Route path='/' element={<Login />} />
+          <Route path='/profile' element={isLogin ? <Profile /> : <Navigate to="/" />} />
+          <Route path='/contact' element={isLogin ? <Contact /> : <Navigate to="/" />} />
+          <Route path='/admin' element={isLogin ? <Admin /> : <Navigate to="/" />} />
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }
