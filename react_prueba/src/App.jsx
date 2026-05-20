@@ -23,16 +23,17 @@ function Layout({ isLogin, user, users, login, addUser, delUser }) {
 
 function App() {
   const [isLogin, setIsLogin] = useState(false);
-  const [user, setUser] = useState({});
-  const [users, setUsers] = useState([]);
+  const [token, setToken] = useState("");
+  const [user, setUser] = useState([]);
+  const [users, setUsers ] = useState([])
 
   useEffect(() => {
     if (isLogin) {
       const getUsers = async () => {
-        const res = await fetch(API_URL + "/api/users");
+        const res = await fetch(API_URL + "/api/users", { headers: { authorization: "Bearer " + token } })
         const data = await res.json();
         setUsers(data);
-      };
+      }
       getUsers();
     }
   }, [isLogin]);
@@ -46,9 +47,10 @@ function App() {
       });
       const data = await res.json();
       if (data.login) {
-        setUser(data.user);
         setIsLogin(true);
-        return true;
+        setUser(data.user);
+        setToken(data.token);
+        return data;
       }
       return false;
     } catch (err) {
@@ -60,7 +62,7 @@ function App() {
   const addUser = async (newUser) => {
     const res = await fetch(API_URL + "/api/users", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", authorization:token},
       body: JSON.stringify(newUser)
     });
     const data = await res.json();
@@ -68,8 +70,8 @@ function App() {
   };
 
   const delUser = async (id) => {
-    await fetch(API_URL + "/api/users/" + id, { method: "DELETE" });
     setUsers(prev => prev.filter(u => u._id !== id));
+    await fetch(API_URL + "/api/users/" + id, { method: "DELETE", headers: { authorization: "Bearer " + token } });
   };
 
   return (
