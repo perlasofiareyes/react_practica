@@ -7,7 +7,7 @@ import Contact from './views/Contact';
 import Admin from './views/Admin';
 import ResponsiveAppBar from './components/NavBar';
 
-const API_URL = "https://api-production-d98c3.up.railway.app/"
+const API_URL = "https://api-production-d98c3.up.railway.app"
 
 function Layout({ isLogin, user, users, login, addUser, delUser }) {
   const location = useLocation();
