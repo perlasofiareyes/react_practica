@@ -7,7 +7,7 @@ import Contact from './views/Contact';
 import Admin from './views/Admin';
 import ResponsiveAppBar from './components/NavBar';
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000"
+const API_URL = "https://api-production-d98c3.up.railway.app/"
 
 function Layout({ isLogin, user, users, login, addUser, delUser }) {
   const location = useLocation();
@@ -39,24 +39,19 @@ function App() {
   }, [isLogin]);
 
   const login = async (username, password) => {
-    try {
-      const res = await fetch(API_URL + "/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
-      if (data.login) {
-        setIsLogin(true);
-        setUser(data.user);
-        setToken(data.token);
-        return data;
-      }
-      return false;
-    } catch (err) {
-      console.error("Error al conectar con la API:", err);
-      return false;
+    const res = await fetch(API_URL + "/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (data.login) {
+      setIsLogin(true);
+      setUser(data.user);
+      setToken(data.token);
+      return data;
     }
+    return false;
   };
 
   const addUser = async (newUser) => {
