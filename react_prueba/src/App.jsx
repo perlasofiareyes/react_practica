@@ -7,7 +7,7 @@ import Contact from './views/Contact';
 import Admin from './views/Admin';
 import ResponsiveAppBar from './components/NavBar';
 
-const API_URL = "http://localhost:3000"
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000"
 
 function Layout({ isLogin, user, users, login, addUser, delUser }) {
   const location = useLocation();
