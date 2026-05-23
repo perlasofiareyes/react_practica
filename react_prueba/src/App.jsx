@@ -30,7 +30,7 @@ function App() {
   useEffect(() => {
     if (isLogin) {
       const getUsers = async () => {
-        const res = await fetch(API_URL + "/api/users", { headers: { authorization: "Bearer " + token } })
+        const res = await fetch(API_URL + "/users", { headers: { authorization: "Bearer " + token } })
         const data = await res.json();
         setUsers(data);
       }
@@ -39,7 +39,7 @@ function App() {
   }, [isLogin]);
 
   const login = async (username, password) => {
-    const res = await fetch(API_URL + "/api/login", {
+    const res = await fetch(API_URL + "/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password })
@@ -55,7 +55,7 @@ function App() {
   };
 
   const addUser = async (newUser) => {
-    const res = await fetch(API_URL + "/api/users", {
+    const res = await fetch(API_URL + "/users", {
       method: "POST",
       headers: { "Content-Type": "application/json", authorization:token},
       body: JSON.stringify(newUser)
@@ -66,7 +66,7 @@ function App() {
 
   const delUser = async (id) => {
     setUsers(prev => prev.filter(u => u._id !== id));
-    await fetch(API_URL + "/api/users/" + id, { method: "DELETE", headers: { authorization: "Bearer " + token } });
+    await fetch(API_URL + "/users/" + id, { method: "DELETE", headers: { authorization: "Bearer " + token } });
   };
 
   return (
