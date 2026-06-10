@@ -6,6 +6,9 @@ import Profile from './views/Profile';
 import Contact from './views/Contact';
 import Admin from './views/Admin';
 import ResponsiveAppBar from './components/NavBar';
+import Details from './components/Details';
+import useAuth from './hooks/useAuth';
+import LifeCycle from '';
 
 const API_URL = "https://api-production-d98c3.up.railway.app"
 
@@ -22,65 +25,28 @@ function Layout({ isLogin, user, users, login, addUser, delUser }) {
 }
 
 function App() {
-  const [isLogin, setIsLogin] = useState(false);
-  const [token, setToken] = useState("");
-  const [user, setUser] = useState([]);
-  const [users, setUsers ] = useState([])
+  const {isLogin, token, user, login, logout } = useAuth()
+  const {getUsers, delUser, addUser, users} = useAdmin(token)
 
   useEffect(() => {
     if (isLogin) {
-      const getUsers = async () => {
-        const res = await fetch(API_URL + "/users", { headers: { authorization: "Bearer " + token } })
-        const data = await res.json();
-        setUsers(data);
-      }
-      getUsers();
+      getUsers()
     }
   }, [isLogin]);
-
-  const login = async (username, password) => {
-    const res = await fetch(API_URL + "/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
-    if (data.login) {
-      setIsLogin(true);
-      setUser(data.user);
-      setToken(data.token);
-      return data;
-    }
-    return false;
-  };
-
-  const addUser = async (newUser) => {
-    const res = await fetch(API_URL + "/users", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", authorization:token},
-      body: JSON.stringify(newUser)
-    });
-    const data = await res.json();
-    setUsers(prev => [...prev, data]);
-  };
-
-  const delUser = async (id) => {
-    setUsers(prev => prev.filter(u => u._id !== id));
-    await fetch(API_URL + "/users/" + id, { method: "DELETE", headers: { authorization: "Bearer " + token } });
-  };
-
   return (
+    <>
     <BrowserRouter>
-      <Routes>
-        <Route element={<Layout isLogin={isLogin} user={user} users={users} login={login} addUser={addUser} delUser={delUser} />}>
-          <Route path='/' element={<Login />} />
-          <Route path='/profile' element={isLogin ? <Profile /> : <Navigate to="/" />} />
-          <Route path='/contact' element={isLogin ? <Contact /> : <Navigate to="/" />} />
-          <Route path='/admin' element={isLogin ? <Admin /> : <Navigate to="/" />} />
-        </Route>
-      </Routes>
+    {isLogin && <ResponsiveAppBar logout={logout}/>}
+    <Routes>
+        <Route path='/' element={<Login login={login} />} />
+        <Route path='/profile' element={<Profile user={user}/>} />
+        <Route path='/admin' element={<Admin addUser={addUser} users={users} delUser={delUser} />} />
+        <Route path='/users/:username' element={<Details users={users}/>}/>
+    </Routes>
     </BrowserRouter>
-  );
+    {show && <LifeCycle />}
+    </>
+  )
 }
 
 export default App;

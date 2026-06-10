@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
@@ -37,7 +38,9 @@ const Admin = () => {
         <tbody>
           {users.map(u => (
             <tr key={u._id}>
-              <td style={{ border: '1px solid #ddd', padding: '8px' }}>{u.name}</td>
+              <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                <Link to={"/users/" + u.username}>{u.name}</Link>
+              </td>
               <td style={{ border: '1px solid #ddd', padding: '8px' }}>{u.username}</td>
               <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                 <Button variant="contained" color="error" size="small" onClick={() => delUser(u._id)}>Eliminar</Button>

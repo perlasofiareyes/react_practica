@@ -1,10 +1,11 @@
-
+import React from "react";
+import { Link } from "react-router-dom";
 
 const User = ({ user, delUser }) => (
   <tr>
-    <td>{user._id}</td>
-    <td>{user.name}</td>
+    <Link to={"/users/" + user.username + "?react=889"}>{user.name}</Link>
     <td>{user.username}</td>
+    <td><button onClick={()=> delUser(user._id)}>X</button></td>
   </tr>
 );
 

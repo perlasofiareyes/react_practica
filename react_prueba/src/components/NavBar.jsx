@@ -21,7 +21,7 @@ const pages = [
 
 const settings = ['Logout'];
 
-function ResponsiveAppBar() {
+function ResponsiveAppBar({ user, logout }) {
   const navigate = useNavigate();
 
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -45,7 +45,8 @@ function ResponsiveAppBar() {
   };
 
   const handleLogout = () => {
-    navigate('/'); // regresa a login
+    logout();       
+    navigate('/');
     setAnchorElUser(null);
   };
 
@@ -94,7 +95,7 @@ function ResponsiveAppBar() {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Opciones">
               <IconButton onClick={handleOpenUserMenu}>
-                <Avatar />
+                <Avatar>{user?.name?.[0]?.toUpperCase()}</Avatar>
               </IconButton>
             </Tooltip>
 
